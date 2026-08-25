@@ -15,7 +15,7 @@ export function SiteFooter() {
           <ul className="mt-2 space-y-1.5 text-muted-foreground">
             <li><Link to="/assistant" className="hover:text-foreground">AI Knowledge Assistant</Link></li>
             <li><Link to="/explorer" className="hover:text-foreground">Cultural Heritage Explorer</Link></li>
-            <li><Link to="/search" className="hover:text-foreground">Search Results</Link></li>
+            <li><Link to="/search" search={{ q: "" }} className="hover:text-foreground">Search Results</Link></li>
           </ul>
         </div>
         <div className="text-sm">
