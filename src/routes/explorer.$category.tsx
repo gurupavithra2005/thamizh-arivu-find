@@ -1,16 +1,15 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft, MessagesSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { MockBadge } from "@/components/common/MockBadge";
 import { SectionHeading } from "@/components/common/SectionHeading";
 import { SourceCard } from "@/components/sources/SourceCard";
-import { HERITAGE_CATEGORIES, MOCK_SOURCES } from "@/lib/mock-data";
+import { getHeritageCategory } from "@/lib/catalogue.functions";
 
 export const Route = createFileRoute("/explorer/$category")({
-  loader: ({ params }) => {
-    const category = HERITAGE_CATEGORIES.find((c) => c.slug === params.category);
-    if (!category) throw notFound();
-    return { category };
+  loader: async ({ params }) => {
+    const result = await getHeritageCategory({ data: { slug: params.category } });
+    if (!result) throw notFound();
+    return result;
   },
   head: ({ loaderData }) => {
     if (!loaderData) {
@@ -30,6 +29,7 @@ export const Route = createFileRoute("/explorer/$category")({
     };
   },
   notFoundComponent: CategoryNotFound,
+  errorComponent: CategoryNotFound,
   component: CategoryPage,
 });
 
@@ -48,7 +48,7 @@ function CategoryNotFound() {
 }
 
 function CategoryPage() {
-  const { category } = Route.useLoaderData();
+  const { category, sources } = Route.useLoaderData();
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12">
@@ -67,7 +67,7 @@ function CategoryPage() {
           description={category.description}
           action={
             <Button asChild>
-              <Link to="/assistant">
+              <Link to="/assistant" search={{ q: category.topics[0]?.query ?? category.title }}>
                 <MessagesSquare className="mr-1 size-4" aria-hidden /> Ask about this theme
               </Link>
             </Button>
@@ -76,28 +76,32 @@ function CategoryPage() {
       </div>
 
       <h2 className="mt-10 text-lg font-semibold">Topics</h2>
-      <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {category.topics.map((topic) => (
-          <Link
-            key={topic}
-            to="/search"
-            search={{ q: topic }}
-            className="panel p-4 text-sm font-medium transition-colors hover:border-primary/40"
-          >
-            {topic}
-          </Link>
-        ))}
-      </div>
+      {category.topics.length === 0 ? (
+        <p className="mt-3 text-sm text-muted-foreground">No topics published for this theme yet.</p>
+      ) : (
+        <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {category.topics.map((topic) => (
+            <Link
+              key={topic.id}
+              to="/assistant"
+              search={{ q: topic.query }}
+              className="panel p-4 text-left transition-colors hover:border-primary/40"
+            >
+              <p className="text-sm font-medium">{topic.title}</p>
+              {topic.description && (
+                <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                  {topic.description}
+                </p>
+              )}
+              <p className="font-tamil mt-2 text-xs text-primary">{topic.query}</p>
+            </Link>
+          ))}
+        </div>
+      )}
 
-      <div className="mt-12 flex items-center justify-between gap-3">
-        <h2 className="text-lg font-semibold">Related knowledge sources</h2>
-        <MockBadge label="Mock sources" />
-      </div>
-      <p className="mt-1 text-sm text-muted-foreground">
-        Real sources will be discovered dynamically per query once the retrieval pipeline is wired.
-      </p>
-      <div className="mt-4 grid gap-3 lg:grid-cols-2">
-        {MOCK_SOURCES.map((s, i) => (
+      <h2 className="mt-12 text-lg font-semibold">Sources available for this theme</h2>
+      <div className="mt-3 grid gap-3 lg:grid-cols-2">
+        {sources.map((s, i) => (
           <SourceCard key={s.id} source={s} rank={i + 1} />
         ))}
       </div>
