@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AssistantRouteImport } from './routes/assistant'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ExplorerRouteImport } from './routes/explorer'
 import { Route as HistoryRouteImport } from './routes/history'
 import { Route as SearchRouteImport } from './routes/search'
@@ -33,6 +34,11 @@ const AboutRoute = AboutRouteImport.update({
 const AssistantRoute = AssistantRouteImport.update({
   id: '/assistant',
   path: '/assistant',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExplorerRoute = ExplorerRouteImport.update({
@@ -75,6 +81,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/assistant': typeof AssistantRoute
+  '/auth': typeof AuthRoute
   '/explorer': typeof ExplorerRouteWithChildren
   '/history': typeof HistoryRoute
   '/search': typeof SearchRoute
@@ -87,6 +94,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/assistant': typeof AssistantRoute
+  '/auth': typeof AuthRoute
   '/history': typeof HistoryRoute
   '/search': typeof SearchRoute
   '/sources': typeof SourcesRoute
@@ -99,6 +107,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/assistant': typeof AssistantRoute
+  '/auth': typeof AuthRoute
   '/explorer': typeof ExplorerRouteWithChildren
   '/history': typeof HistoryRoute
   '/search': typeof SearchRoute
@@ -113,6 +122,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/assistant'
+    | '/auth'
     | '/explorer'
     | '/history'
     | '/search'
@@ -125,6 +135,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/assistant'
+    | '/auth'
     | '/history'
     | '/search'
     | '/sources'
@@ -136,6 +147,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/assistant'
+    | '/auth'
     | '/explorer'
     | '/history'
     | '/search'
@@ -149,6 +161,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AssistantRoute: typeof AssistantRoute
+  AuthRoute: typeof AuthRoute
   ExplorerRoute: typeof ExplorerRouteWithChildren
   HistoryRoute: typeof HistoryRoute
   SearchRoute: typeof SearchRoute
@@ -177,6 +190,13 @@ declare module '@tanstack/react-router' {
       path: '/assistant'
       fullPath: '/assistant'
       preLoaderRoute: typeof AssistantRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/explorer': {
@@ -249,6 +269,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AssistantRoute: AssistantRoute,
+  AuthRoute: AuthRoute,
   ExplorerRoute: ExplorerRouteWithChildren,
   HistoryRoute: HistoryRoute,
   SearchRoute: SearchRoute,

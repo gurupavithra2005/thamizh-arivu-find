@@ -1,48 +1,66 @@
 import { useMemo, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { SectionHeading } from "@/components/common/SectionHeading";
-import { MockBadge } from "@/components/common/MockBadge";
 import { SourceCard } from "@/components/sources/SourceCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { MOCK_SOURCES, SOURCE_TYPE_LABEL, type SourceType } from "@/lib/mock-data";
+import { listKnowledgeSources } from "@/lib/catalogue.functions";
+import { SOURCE_TYPE_LABEL, type SourceType } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/sources")({
+  loader: () => listKnowledgeSources(),
   head: () => ({
     meta: [
       { title: "Knowledge Sources — THAMIZHARIVU AI" },
       {
         name: "description",
         content:
-          "Every answer is traceable. Review the webpages, books, e-books, PDFs and digital archives retrieved and ranked for each query.",
+          "Every answer is traceable. Review the webpages, books, e-books, PDFs and digital archives available to the assistant.",
       },
       { property: "og:title", content: "Knowledge Sources — THAMIZHARIVU AI" },
       {
         property: "og:description",
-        content: "Ranked, linkable Tamil knowledge sources with supporting passages.",
+        content: "Linkable Tamil knowledge sources with publisher and credibility details.",
       },
     ],
   }),
+  errorComponent: SourcesError,
+  notFoundComponent: SourcesError,
   component: SourcesPage,
 });
+
+function SourcesError() {
+  return (
+    <div className="mx-auto max-w-3xl px-4 py-20 text-center">
+      <h1 className="text-2xl font-semibold">Sources could not be loaded</h1>
+      <p className="mt-2 text-sm text-muted-foreground">
+        The source library is temporarily unavailable. Please try again.
+      </p>
+      <Button asChild className="mt-6">
+        <Link to="/">Go home</Link>
+      </Button>
+    </div>
+  );
+}
 
 const FILTERS: (SourceType | "all")[] = ["all", "webpage", "book", "ebook", "pdf", "archive", "ocr"];
 
 function SourcesPage() {
+  const sources = Route.useLoaderData();
   const [query, setQuery] = useState("");
   const [type, setType] = useState<SourceType | "all">("all");
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return MOCK_SOURCES.filter(
+    return sources.filter(
       (s) =>
         (type === "all" || s.type === type) &&
         (q === "" ||
           s.title.toLowerCase().includes(q) ||
           s.publisher.toLowerCase().includes(q) ||
-          (s.titleTamil ?? "").includes(query.trim())),
-    ).sort((a, b) => b.relevance - a.relevance);
-  }, [query, type]);
+          s.passage.toLowerCase().includes(q)),
+    );
+  }, [query, type, sources]);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12">
@@ -50,8 +68,7 @@ function SourcesPage() {
         eyebrow="Transparency layer"
         title="Knowledge sources"
         tamilTitle="மூலங்கள்"
-        description="Sources are discovered dynamically per query, then ranked by hybrid keyword and semantic relevance."
-        action={<MockBadge label="Mock source index" />}
+        description="These are the real archives, e-texts and reference works the assistant is allowed to cite."
       />
 
       <div className="mt-8 flex flex-wrap items-center gap-2">
@@ -74,7 +91,11 @@ function SourcesPage() {
         ))}
       </div>
 
-      <div className="mt-6 grid gap-3 lg:grid-cols-2">
+      <p className="mt-4 text-xs text-muted-foreground">
+        {sources.length} source{sources.length === 1 ? "" : "s"} in the library
+      </p>
+
+      <div className="mt-4 grid gap-3 lg:grid-cols-2">
         {results.length === 0 ? (
           <p className="text-sm text-muted-foreground">No sources match this filter.</p>
         ) : (
