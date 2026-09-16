@@ -18,14 +18,26 @@ function serverEnv(name: string, fallback: string): string {
 /** Must match the vector(N) column in public.document_chunks. */
 export const EMBEDDING_DIMENSION = 768;
 
-export const embeddingConfig = () => ({
-  provider: serverEnv("EMBEDDING_PROVIDER", "google"),
-  model: serverEnv("EMBEDDING_MODEL", "text-embedding-004"),
-  dimension: Number(serverEnv("EMBEDDING_DIMENSION", String(EMBEDDING_DIMENSION))),
-});
+/**
+ * Embedding provider is resolved once, here. "lovable" needs no user key;
+ * "huggingface" uses a multilingual E5 model that also outputs 768 dimensions,
+ * so either provider fits the existing vector column.
+ */
+export const embeddingConfig = () => {
+  const provider = serverEnv("EMBEDDING_PROVIDER", "lovable").toLowerCase();
+  const defaultModel =
+    provider === "huggingface" || provider === "hf"
+      ? "intfloat/multilingual-e5-base"
+      : "openai/text-embedding-3-small";
+  return {
+    provider,
+    model: serverEnv("EMBEDDING_MODEL", defaultModel),
+    dimension: Number(serverEnv("EMBEDDING_DIMENSION", String(EMBEDDING_DIMENSION))),
+  };
+};
 
 export const llmConfig = () => ({
-  model: serverEnv("LLM_MODEL", "google/gemini-2.5-flash"),
+  model: serverEnv("LLM_MODEL", "google/gemini-3.8-flash"),
 });
 
 export const webSearchConfig = () => ({
