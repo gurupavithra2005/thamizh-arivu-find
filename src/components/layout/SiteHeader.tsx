@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
+import { AuthButton } from "@/components/layout/AuthButton";
 import { Button } from "@/components/ui/button";
 
 const NAV = [
@@ -35,6 +36,7 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-2">
+          <AuthButton />
           <Button asChild size="sm" className="hidden sm:inline-flex">
             <Link to="/assistant">Start exploring</Link>
           </Button>
