@@ -35,3 +35,33 @@ export function toUiSource(row: KnowledgeSourceRow, relevance = 0): KnowledgeSou
     verified: row.credibility_level === "trusted" || row.credibility_level === "verified",
   };
 }
+
+/** A retrieved chunk or stored citation, as the source cards need it. */
+export type RetrievedLike = {
+  chunkId: number;
+  sourceId: string;
+  sourceTitle: string;
+  sourceUrl: string | null;
+  publisher: string | null;
+  sourceType: string;
+  credibility: string;
+  language: string;
+  score: number;
+  pageNumber: number | null;
+} & ({ content: string } | { snippet: string });
+
+/** Maps a real retrieved passage onto the existing source-card shape. */
+export function retrievedToUiSource(item: RetrievedLike): KnowledgeSource {
+  const passage = "content" in item ? item.content : item.snippet;
+  return {
+    id: `chunk-${item.chunkId}`,
+    title: item.sourceTitle,
+    type: SOURCE_TYPE_MAP[item.sourceType] ?? "document",
+    url: item.sourceUrl ?? "#",
+    publisher: item.publisher ?? "Unknown publisher",
+    relevance: item.score,
+    passage: item.pageNumber ? `p.${item.pageNumber} — ${passage}` : passage,
+    language: item.language === "en" ? "en" : item.language === "ta" ? "ta" : "mixed",
+    verified: item.credibility === "trusted" || item.credibility === "verified",
+  };
+}
