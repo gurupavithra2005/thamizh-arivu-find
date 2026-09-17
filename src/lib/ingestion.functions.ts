@@ -97,7 +97,6 @@ export const ingestUserDocument = createServerFn({ method: "POST" })
         description: "User-supplied document indexed from the OCR upload page.",
         credibility_level: "needs_review",
         status: "active",
-        metadata: { uploaded_by: ctx.userId, file_path: data.filePath },
       })
       .select("id")
       .single();
