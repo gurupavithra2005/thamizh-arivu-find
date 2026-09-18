@@ -20,6 +20,7 @@ import { Route as SourcesRouteImport } from './routes/sources'
 import { Route as UploadRouteImport } from './routes/upload'
 import { Route as ExplorerIndexRouteImport } from './routes/explorer.index'
 import { Route as ExplorerCategoryRouteImport } from './routes/explorer.$category'
+import { Route as ApiPublicIngestRouteImport } from './routes/api/public/ingest'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -76,6 +77,11 @@ const ExplorerCategoryRoute = ExplorerCategoryRouteImport.update({
   path: '/$category',
   getParentRoute: () => ExplorerRoute,
 } as any)
+const ApiPublicIngestRoute = ApiPublicIngestRouteImport.update({
+  id: '/api/public/ingest',
+  path: '/api/public/ingest',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -89,6 +95,7 @@ export interface FileRoutesByFullPath {
   '/upload': typeof UploadRoute
   '/explorer/$category': typeof ExplorerCategoryRoute
   '/explorer/': typeof ExplorerIndexRoute
+  '/api/public/ingest': typeof ApiPublicIngestRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -101,6 +108,7 @@ export interface FileRoutesByTo {
   '/upload': typeof UploadRoute
   '/explorer/$category': typeof ExplorerCategoryRoute
   '/explorer': typeof ExplorerIndexRoute
+  '/api/public/ingest': typeof ApiPublicIngestRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -115,6 +123,7 @@ export interface FileRoutesById {
   '/upload': typeof UploadRoute
   '/explorer/$category': typeof ExplorerCategoryRoute
   '/explorer/': typeof ExplorerIndexRoute
+  '/api/public/ingest': typeof ApiPublicIngestRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -130,6 +139,7 @@ export interface FileRouteTypes {
     | '/upload'
     | '/explorer/$category'
     | '/explorer/'
+    | '/api/public/ingest'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -142,6 +152,7 @@ export interface FileRouteTypes {
     | '/upload'
     | '/explorer/$category'
     | '/explorer'
+    | '/api/public/ingest'
   id:
     | '__root__'
     | '/'
@@ -155,6 +166,7 @@ export interface FileRouteTypes {
     | '/upload'
     | '/explorer/$category'
     | '/explorer/'
+    | '/api/public/ingest'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -167,6 +179,7 @@ export interface RootRouteChildren {
   SearchRoute: typeof SearchRoute
   SourcesRoute: typeof SourcesRoute
   UploadRoute: typeof UploadRoute
+  ApiPublicIngestRoute: typeof ApiPublicIngestRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -248,6 +261,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExplorerCategoryRouteImport
       parentRoute: typeof ExplorerRoute
     }
+    '/api/public/ingest': {
+      id: '/api/public/ingest'
+      path: '/api/public/ingest'
+      fullPath: '/api/public/ingest'
+      preLoaderRoute: typeof ApiPublicIngestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -275,6 +295,7 @@ const rootRouteChildren: RootRouteChildren = {
   SearchRoute: SearchRoute,
   SourcesRoute: SourcesRoute,
   UploadRoute: UploadRoute,
+  ApiPublicIngestRoute: ApiPublicIngestRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
