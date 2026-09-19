@@ -39,7 +39,7 @@ export async function runIngestion(
     .insert({
       source_id: params.sourceId,
       job_type: "ingest",
-      status: "processing",
+      status: "running",
       progress: 0,
       started_at: new Date().toISOString(),
     })
