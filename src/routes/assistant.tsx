@@ -17,9 +17,9 @@ import { detectLanguage } from "@/lib/language-detect";
 import type { ChatMessage, KnowledgeSource, SourceType } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/assistant")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    q: typeof search["q"] === "string" ? (search["q"] as string) : "",
-    c: typeof search["c"] === "string" ? (search["c"] as string) : "",
+  validateSearch: (search: Record<string, unknown>): { q?: string; c?: string } => ({
+    ...(typeof search["q"] === "string" && search["q"] ? { q: search["q"] as string } : {}),
+    ...(typeof search["c"] === "string" && search["c"] ? { c: search["c"] as string } : {}),
   }),
   head: () => ({
     meta: [
@@ -65,7 +65,7 @@ function citationToSource(c: StoredCitation, type: SourceType = "document"): Kno
 }
 
 function AssistantPage() {
-  const { q, c } = Route.useSearch();
+  const { q = "", c = "" } = Route.useSearch();
   const { isSignedIn, loading: authLoading } = useAuth();
   const ask = useServerFn(askAssistant);
 
