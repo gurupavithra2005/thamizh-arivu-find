@@ -2,13 +2,17 @@ import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SectionHeading } from "@/components/common/SectionHeading";
 import { SourceCard } from "@/components/sources/SourceCard";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { listKnowledgeSources } from "@/lib/catalogue.functions";
+import { listKnowledgeSources, listSourceLibraryStats } from "@/lib/catalogue.functions";
 import { SOURCE_TYPE_LABEL, type SourceType } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/sources")({
-  loader: () => listKnowledgeSources(),
+  loader: async () => {
+    const [sources, stats] = await Promise.all([listKnowledgeSources(), listSourceLibraryStats()]);
+    return { sources, stats };
+  },
   head: () => ({
     meta: [
       { title: "Knowledge Sources — THAMIZHARIVU AI" },
@@ -45,10 +49,22 @@ function SourcesError() {
 
 const FILTERS: (SourceType | "all")[] = ["all", "webpage", "book", "ebook", "pdf", "archive", "ocr"];
 
+const STATUS_LABEL: Record<string, string> = {
+  pending: "Pending",
+  processing: "Processing",
+  completed: "Completed",
+  failed: "Failed",
+};
+
 function SourcesPage() {
-  const sources = Route.useLoaderData();
+  const { sources, stats } = Route.useLoaderData();
   const [query, setQuery] = useState("");
   const [type, setType] = useState<SourceType | "all">("all");
+
+  const statBySource = useMemo(
+    () => new Map(stats.map((s) => [s.sourceId, s])),
+    [stats],
+  );
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -61,6 +77,9 @@ function SourcesPage() {
           s.passage.toLowerCase().includes(q)),
     );
   }, [query, type, sources]);
+
+  const indexed = stats.filter((s) => s.embeddedCount > 0).length;
+  const passages = stats.reduce((sum, s) => sum + s.embeddedCount, 0);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12">
@@ -92,14 +111,48 @@ function SourcesPage() {
       </div>
 
       <p className="mt-4 text-xs text-muted-foreground">
-        {sources.length} source{sources.length === 1 ? "" : "s"} in the library
+        {sources.length} source{sources.length === 1 ? "" : "s"} in the library — {indexed} indexed,{" "}
+        {passages.toLocaleString()} searchable passage{passages === 1 ? "" : "s"}
       </p>
 
       <div className="mt-4 grid gap-3 lg:grid-cols-2">
         {results.length === 0 ? (
           <p className="text-sm text-muted-foreground">No sources match this filter.</p>
         ) : (
-          results.map((s, i) => <SourceCard key={s.id} source={s} rank={i + 1} />)
+          results.map((s, i) => {
+            const stat = statBySource.get(s.id);
+            const status = stat?.processingStatus ?? "pending";
+            return (
+              <div key={s.id} className="space-y-1.5">
+                <SourceCard source={s} rank={i + 1} />
+                <div className="flex flex-wrap items-center gap-1.5 px-1">
+                  <Badge
+                    variant={
+                      status === "completed"
+                        ? "secondary"
+                        : status === "failed"
+                          ? "destructive"
+                          : "outline"
+                    }
+                    className="text-[11px]"
+                  >
+                    {STATUS_LABEL[status] ?? status}
+                  </Badge>
+                  <Badge variant="outline" className="text-[11px]">
+                    {stat?.chunkCount ?? 0} passages
+                  </Badge>
+                  <Badge variant="outline" className="text-[11px]">
+                    {stat?.embeddedCount ?? 0} embedded
+                  </Badge>
+                  {(stat?.pageCount ?? 0) > 0 && (
+                    <Badge variant="outline" className="text-[11px]">
+                      {stat?.pageCount} page{stat?.pageCount === 1 ? "" : "s"}
+                    </Badge>
+                  )}
+                </div>
+              </div>
+            );
+          })
         )}
       </div>
     </div>
