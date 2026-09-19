@@ -114,3 +114,29 @@ export const getHeritageCategory = createServerFn({ method: "GET" })
       };
     },
   );
+
+export type SourceLibraryStat = {
+  sourceId: string;
+  documentCount: number;
+  processingStatus: string;
+  pageCount: number;
+  chunkCount: number;
+  embeddedCount: number;
+};
+
+/** Real indexing state per source, for the Knowledge Sources page. */
+export const listSourceLibraryStats = createServerFn({ method: "GET" }).handler(
+  async (): Promise<SourceLibraryStat[]> => {
+    const supabase = publicClient();
+    const { data, error } = await supabase.rpc("source_library_stats");
+    if (error) throw new Error(error.message);
+    return (data ?? []).map((row) => ({
+      sourceId: row.source_id as string,
+      documentCount: row.document_count as number,
+      processingStatus: row.processing_status as string,
+      pageCount: row.page_count as number,
+      chunkCount: row.chunk_count as number,
+      embeddedCount: row.embedded_count as number,
+    }));
+  },
+);
