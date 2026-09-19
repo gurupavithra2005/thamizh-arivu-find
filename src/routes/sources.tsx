@@ -2,13 +2,17 @@ import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SectionHeading } from "@/components/common/SectionHeading";
 import { SourceCard } from "@/components/sources/SourceCard";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { listKnowledgeSources } from "@/lib/catalogue.functions";
+import { listKnowledgeSources, listSourceLibraryStats } from "@/lib/catalogue.functions";
 import { SOURCE_TYPE_LABEL, type SourceType } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/sources")({
-  loader: () => listKnowledgeSources(),
+  loader: async () => {
+    const [sources, stats] = await Promise.all([listKnowledgeSources(), listSourceLibraryStats()]);
+    return { sources, stats };
+  },
   head: () => ({
     meta: [
       { title: "Knowledge Sources — THAMIZHARIVU AI" },
