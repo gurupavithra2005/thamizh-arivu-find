@@ -15,6 +15,8 @@ import { Route as AssistantRouteImport } from './routes/assistant'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ExplorerRouteImport } from './routes/explorer'
 import { Route as HistoryRouteImport } from './routes/history'
+import { Route as LibraryRouteImport } from './routes/library'
+import { Route as ResearcherRouteImport } from './routes/researcher'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as SourcesRouteImport } from './routes/sources'
 import { Route as UploadRouteImport } from './routes/upload'
@@ -50,6 +52,16 @@ const ExplorerRoute = ExplorerRouteImport.update({
 const HistoryRoute = HistoryRouteImport.update({
   id: '/history',
   path: '/history',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LibraryRoute = LibraryRouteImport.update({
+  id: '/library',
+  path: '/library',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResearcherRoute = ResearcherRouteImport.update({
+  id: '/researcher',
+  path: '/researcher',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SearchRoute = SearchRouteImport.update({
@@ -90,6 +102,8 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/explorer': typeof ExplorerRouteWithChildren
   '/history': typeof HistoryRoute
+  '/library': typeof LibraryRoute
+  '/researcher': typeof ResearcherRoute
   '/search': typeof SearchRoute
   '/sources': typeof SourcesRoute
   '/upload': typeof UploadRoute
@@ -103,6 +117,8 @@ export interface FileRoutesByTo {
   '/assistant': typeof AssistantRoute
   '/auth': typeof AuthRoute
   '/history': typeof HistoryRoute
+  '/library': typeof LibraryRoute
+  '/researcher': typeof ResearcherRoute
   '/search': typeof SearchRoute
   '/sources': typeof SourcesRoute
   '/upload': typeof UploadRoute
@@ -118,6 +134,8 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/explorer': typeof ExplorerRouteWithChildren
   '/history': typeof HistoryRoute
+  '/library': typeof LibraryRoute
+  '/researcher': typeof ResearcherRoute
   '/search': typeof SearchRoute
   '/sources': typeof SourcesRoute
   '/upload': typeof UploadRoute
@@ -134,6 +152,8 @@ export interface FileRouteTypes {
     | '/auth'
     | '/explorer'
     | '/history'
+    | '/library'
+    | '/researcher'
     | '/search'
     | '/sources'
     | '/upload'
@@ -147,6 +167,8 @@ export interface FileRouteTypes {
     | '/assistant'
     | '/auth'
     | '/history'
+    | '/library'
+    | '/researcher'
     | '/search'
     | '/sources'
     | '/upload'
@@ -161,6 +183,8 @@ export interface FileRouteTypes {
     | '/auth'
     | '/explorer'
     | '/history'
+    | '/library'
+    | '/researcher'
     | '/search'
     | '/sources'
     | '/upload'
@@ -176,6 +200,8 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   ExplorerRoute: typeof ExplorerRouteWithChildren
   HistoryRoute: typeof HistoryRoute
+  LibraryRoute: typeof LibraryRoute
+  ResearcherRoute: typeof ResearcherRoute
   SearchRoute: typeof SearchRoute
   SourcesRoute: typeof SourcesRoute
   UploadRoute: typeof UploadRoute
@@ -224,6 +250,20 @@ declare module '@tanstack/react-router' {
       path: '/history'
       fullPath: '/history'
       preLoaderRoute: typeof HistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/library': {
+      id: '/library'
+      path: '/library'
+      fullPath: '/library'
+      preLoaderRoute: typeof LibraryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/researcher': {
+      id: '/researcher'
+      path: '/researcher'
+      fullPath: '/researcher'
+      preLoaderRoute: typeof ResearcherRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/search': {
@@ -292,6 +332,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   ExplorerRoute: ExplorerRouteWithChildren,
   HistoryRoute: HistoryRoute,
+  LibraryRoute: LibraryRoute,
+  ResearcherRoute: ResearcherRoute,
   SearchRoute: SearchRoute,
   SourcesRoute: SourcesRoute,
   UploadRoute: UploadRoute,
