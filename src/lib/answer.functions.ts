@@ -32,14 +32,13 @@ export type AssistantAnswer = {
 
 const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/responses";
 
-const SYSTEM_PROMPT = `You are THAMIZHARIVU AI, a source-grounded assistant for Tamil literature, culture and digital heritage.
+const SYSTEM_PROMPT = `You are THAMIZHARIVU AI, a helpful Tamil-first assistant for literature, culture, digital heritage and general questions.
 
 STRICT RULES:
-- Answer ONLY from the numbered SOURCE PASSAGES provided. Never use outside knowledge, never invent verses, dates, authors or passages.
-- Cite inline with bracketed numbers matching the passages, e.g. [1], [2].
-- If the passages do not contain enough evidence, reply exactly with a clear statement that the information could not be verified from the available sources, and suggest what source would be needed. Do not guess.
+- When SOURCE PASSAGES are present, use them as the primary evidence and cite inline with bracketed numbers matching the passages, e.g. [1], [2]. Do not invent details about those sources.
+- When SOURCE PASSAGES are absent, still answer the user's question using your general knowledge. Clearly begin with "Not verified in the indexed Tamil sources:" (or the equivalent in Tamil), avoid pretending the answer came from this library, and never fabricate quotations or source citations.
 - Reply in the language of the question: Tamil question -> simple modern Tamil; English -> English; Tanglish/transliteration -> the same mixed style. For Tamil answers, add a short English summary at the end.
-- Be concise and factual. No filler.
+- Be useful, concise and factual. For medical, legal or safety-critical questions, recommend a qualified professional.
 
 After the answer, output a final line beginning with "FOLLOWUPS:" listing up to three short follow-up questions separated by " | ".`;
 
@@ -238,17 +237,10 @@ export const askAssistant = createServerFn({ method: "POST" })
     let raw: string;
     let grounded = chunks.length > 0;
 
-    if (chunks.length === 0) {
-      raw =
-        language === "ta"
-          ? "இந்தக் கேள்விக்கான தகவலை தற்போது உள்ள மூலங்களில் உறுதிப்படுத்த முடியவில்லை. சரிபார்க்கப்பட்ட தமிழ் நூல் அல்லது ஆவணம் ஒன்று பதிவேற்றப்பட்ட பிறகு இதற்கு பதிலளிக்க முடியும்.\n\nEnglish: This could not be verified from the indexed sources yet."
-          : "This could not be verified from the indexed sources. A relevant Tamil text or document needs to be added to the knowledge library before this question can be answered with citations.";
-    } else {
-      raw = await generateAnswer(buildPrompt(data.question, chunks, historyText), model);
-      if (!raw) {
-        raw = "The assistant returned an empty response. Please try asking again.";
-        grounded = false;
-      }
+    raw = await generateAnswer(buildPrompt(data.question, chunks, historyText), model);
+    if (!raw) {
+      raw = language === "ta" ? "மன்னிக்கவும், இப்போது பதிலை உருவாக்க முடியவில்லை." : "I could not generate an answer right now.";
+      grounded = false;
     }
 
     const { answer, followups } = splitFollowups(raw);

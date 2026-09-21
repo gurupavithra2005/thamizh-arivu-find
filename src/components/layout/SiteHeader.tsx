@@ -10,6 +10,8 @@ const NAV = [
   { to: "/explorer", label: "Heritage Explorer" },
   { to: "/sources", label: "Knowledge Sources" },
   { to: "/upload", label: "Tamil OCR" },
+  { to: "/library", label: "Source Library" },
+  { to: "/researcher", label: "Researcher" },
   { to: "/history", label: "History" },
   { to: "/about", label: "How it works" },
 ] as const;

@@ -1,5 +1,6 @@
-- [ ] Add source-passage researcher explainer with grounded citations
-- [ ] Make assistant answer general questions gracefully while preserving evidence labels
-- [ ] Upgrade assistant message/composer presentation without changing the existing visual direction
+- [x] Add source-passage researcher explainer with grounded citations
+- [x] Make assistant answer general questions gracefully while preserving evidence labels
+- [x] Upgrade assistant message/composer presentation without changing the existing visual direction
+- [x] Add authenticated Tamil source-library upload and indexing flow
 - [ ] Validate OCR upload → transcription → correction → indexing → search → citations
 - [ ] Validate assistant, sources, search, history and link flows in preview
