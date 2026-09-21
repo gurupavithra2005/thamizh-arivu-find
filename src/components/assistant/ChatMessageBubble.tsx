@@ -1,4 +1,5 @@
 import { BadgeCheck, Bot, TriangleAlert, User } from "lucide-react";
+import { Message, MessageContent, MessageResponse } from "@/components/ai-elements/message";
 import { MockBadge } from "@/components/common/MockBadge";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -15,7 +16,7 @@ export function ChatMessageBubble({
   const isUser = message.role === "user";
 
   return (
-    <div className={cn("flex gap-3", isUser && "flex-row-reverse")}>
+    <Message from={message.role} className={cn("flex gap-3", isUser && "flex-row-reverse")}>
       <span
         className={cn(
           "grid size-8 shrink-0 place-items-center rounded-lg",
@@ -27,7 +28,7 @@ export function ChatMessageBubble({
       </span>
 
       <div className={cn("max-w-[85%] space-y-2", isUser && "text-right")}>
-        <div
+        <MessageContent
           className={cn(
             "rounded-xl px-4 py-3 text-sm leading-relaxed",
             isUser
@@ -35,8 +36,12 @@ export function ChatMessageBubble({
               : "border border-border bg-card text-card-foreground shadow-sm",
           )}
         >
-          <p className="font-tamil whitespace-pre-wrap">{message.content}</p>
-        </div>
+          {isUser ? (
+            <p className="font-tamil whitespace-pre-wrap">{message.content}</p>
+          ) : (
+            <MessageResponse className="font-tamil whitespace-pre-wrap">{message.content}</MessageResponse>
+          )}
+        </MessageContent>
 
         <div className={cn("flex flex-wrap items-center gap-2", isUser && "justify-end")}>
           {message.detectedLanguage && (
@@ -52,7 +57,7 @@ export function ChatMessageBubble({
           )}
           {!isUser && message.unverified && (
             <span className="inline-flex items-center gap-1 text-[11px] font-medium text-mock-foreground">
-              <TriangleAlert className="size-3.5" aria-hidden /> Could not be verified
+              <TriangleAlert className="size-3.5" aria-hidden /> Not verified in indexed sources
             </span>
           )}
         </div>
@@ -78,6 +83,6 @@ export function ChatMessageBubble({
           </div>
         ) : null}
       </div>
-    </div>
+    </Message>
   );
 }

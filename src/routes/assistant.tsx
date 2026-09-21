@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { Brain, History, Loader2, LogIn } from "lucide-react";
+import { Brain, History, Loader2, LogIn, SearchCheck } from "lucide-react";
+import { Shimmer } from "@/components/ai-elements/shimmer";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -266,8 +267,7 @@ function AssistantPage() {
               <div className="rounded-xl border border-dashed border-border p-5">
                 <h2 className="text-base font-semibold">Ask anything about Tamil heritage</h2>
                 <p className="mt-1.5 text-sm text-muted-foreground">
-                  Every answer is written only from the indexed source passages, cited inline, and
-                  saved to your history. If nothing can be verified, the assistant says so.
+                   Indexed passages are cited when available. Questions outside the library still receive a useful AI answer, clearly marked when it is not verified in the indexed sources.
                 </p>
                 <Button asChild variant="outline" size="sm" className="mt-3">
                   <Link to="/explorer">Browse heritage themes</Link>
@@ -281,8 +281,7 @@ function AssistantPage() {
 
             {pending && (
               <p className="inline-flex items-center gap-2 text-xs text-muted-foreground">
-                <Loader2 className="size-3.5 animate-spin" aria-hidden /> Retrieving passages and
-                writing a grounded answer…
+                 <Loader2 className="size-3.5 animate-spin" aria-hidden /> <Shimmer>Understanding your question and writing an answer…</Shimmer>
               </p>
             )}
           </div>
@@ -302,6 +301,11 @@ function AssistantPage() {
             sources={sources}
             emptyHint="Passages retrieved for the answer will be listed here with their source, page and link."
           />
+          {lastAssistant?.unverified && (
+            <Button asChild variant="outline" className="w-full">
+              <Link to="/researcher"><SearchCheck className="mr-1 size-4" aria-hidden /> Explain a source passage</Link>
+            </Button>
+          )}
           {messages.length > 0 && (
             <Button
               variant="outline"
